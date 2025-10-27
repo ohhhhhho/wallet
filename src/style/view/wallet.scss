@@ -1,0 +1,19 @@
+#wallet{
+    .balance{
+        .inner{
+            .info{
+                display: flex;
+                justify-content: flex-start;
+                align-items: flex-start;
+                flex-direction: column;
+                &__desc{
+                    @include textBody(textBody1);
+                    color:$darkGrey;
+                }
+            }
+            .button-area{
+                padding-top: $global-horizontal-padding;
+            }
+        }
+    }
+}

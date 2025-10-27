@@ -1,0 +1,56 @@
+@mixin font-size($px) {
+	font-size: calc($px / calc($baseFontSize / 1rem));
+}
+
+@mixin textStyles($font-size, $line-height, $letter-spacing, $font-family, $font-weight: null) {
+    @include font-size($font-size);
+    line-height: $line-height;
+    letter-spacing: $letter-spacing;
+    font-family: $font-family;
+
+    @if $font-weight != null {
+        font-weight: $font-weight;
+    }
+}
+
+@mixin textHeading($type) {
+      @if ($type == textHeading1 or $type == textHeading2) {
+        @include textStyles(36px, 44px, 0, 'Grotesk-R');
+      } @else if ($type == textHeading3) {
+        @include textStyles(40px, 48px, 0, 'Grotesk-M');
+      }
+}
+
+@mixin textSubTitle($type) {
+    @if ($type == textSubTitle1) {
+            @include textStyles(28px, 38px, -0.01em, 'SF-Pro-M');
+        } @else if ($type == textSubTitle2 or $type == textSubTitle3) {
+            @include textStyles(24px, 30px, -0.01em, 'SF-Pro-M');
+        } @else if ($type == textSubTitle4) {
+            @include textStyles(20px, 26px, -0.01em, 'SF-Pro-M');
+        } @else if ($type == textSubTitle5) {
+            @include textStyles(15px, 16px, -0.01em, 'SF-Pro-M');
+        } @else if ($type == textSubTitle6) {
+            @include textStyles(17px, 18px, -0.01em, 'SF-Pro-SB');
+        }
+
+}
+  
+@mixin textBody($type) {
+    @if ($type == textBody1) {
+        @include textStyles(15px, 22px, -0.01em, 'SF-Pro-R');
+    } @else if ($type == textBody2) {
+        @include textStyles(13px, 25px, -0.01em, 'SF-Pro-R');
+    }@else if ($type == textBody3) {
+        @include textStyles(18px, 30px, -0.01em, 'SF-Pro-R');
+    }@else if ($type == textBody4) {
+        @include textStyles(28px, 38px, -0.01em, 'SF-Pro-R');
+    }@else if ($type == textBody5) {
+        @include textStyles(16px, 28px, -0.01em, 'SF-Pro-SB');
+    }
+}
+  
+@mixin textButton() {
+  @include textStyles(17px, 20px, -0.01em, 'SF-Pro-M');
+}
+  

@@ -1,0 +1,21 @@
+#about{
+    .section{
+        .inner{
+            .list{
+                .list__item{
+                    &__label{
+                        @include textSubTitle(textSubTitle4);
+                    }
+                    &__value{
+                        margin-top: 5px;
+                        color: $grey;
+                        word-break: break-word;
+                    }
+                    &:not(:first-child){
+                        margin-top: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
