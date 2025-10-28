@@ -9,13 +9,13 @@ export default function ProtectedRoute(){
     }
 
     const parsedWalletData = JSON.parse(walletData);
-    if(!parsedWalletData.id && !parsedWalletData.password){
+    if(!parsedWalletData.id || !parsedWalletData.password){
       return <Navigate to="/" replace={true}/>;
     }
 
     const parseId = decryptUserData(parsedWalletData.id)
     const decryptedPassword = decryptUserData(parsedWalletData.password)
-    if(!parseId && !decryptedPassword){
+    if(!parseId || !decryptedPassword){
       return <Navigate to="/" replace={true}/>;
     }
 

@@ -3,6 +3,7 @@ import { decryptUserData, encryptUserData } from "../utils/crypto";
 import { useNavigate } from "react-router-dom";
 import { getWalletData, setWalletData } from "../utils/walletStorage";
 import { UserImport } from "../types/type";
+import * as bip39 from 'bip39';
 
 export default function Import() {
     const walletData = getWalletData();
@@ -11,47 +12,60 @@ export default function Import() {
     const [error,setError] = useState<string>("");
     const onClickImport = () => {
         if(!ref.current) return;
-        const userInput = ref.current?.value.trim() || "";
-        const userArr = userInput.split(/\s+/);
+        try{
+            const userInput = ref.current?.value.trim() || "";
+            const userArr = userInput.split(/\s+/);
 
-        //새로운 시드로 니모닉 생성
-        if(!walletData) {
-            if(userArr.length === 12 || userArr.length === 18 || userArr.length === 24){
-                const userMnemonic:UserImport = {
-                    mnemonic:encryptUserData(userInput),
-                    isImport:true
+            //새로운 시드로 니모닉 생성
+            if(!walletData) {
+                if(userArr.length === 12 || userArr.length === 18 || userArr.length === 24){
+                    //BIP39 유효성 검사 추가
+                    if (!bip39.validateMnemonic(userInput)) {
+                        setError("Invalid recovery phrase");
+                        return;
+                    }
+                    const userMnemonic:UserImport = {
+                        mnemonic:encryptUserData(userInput),
+                        isImport:true
+                    }
+                    setWalletData(userMnemonic)
+                    navigate('/login');
+                }else{
+                    setError("Invalid recovery phrase");
                 }
-                setWalletData(userMnemonic)
-                navigate('/login');
-            }else{
+                return;
+            };
+
+            const parseData = JSON.parse(walletData);
+            const decryptedMnemonic = decryptUserData(parseData.mnemonic).trim();
+            const invalidRegex = /[^a-z\s]/;
+
+            const mnemonicArr = decryptedMnemonic.split(/\s+/);
+            const diffWord = mnemonicArr.filter((item, idx) => item !== userArr[idx]);
+
+            //특수문자 에러
+            if(invalidRegex.test(userInput)){
                 setError("Invalid recovery phrase");
+                return;
             }
-            return;
-        };
-
-        const parseData = JSON.parse(walletData);
-        const decryptedMnemonic = decryptUserData(parseData.mnemonic).trim();
-        const invalidRegex = /[^a-z\s]/;
-
-        const mnemonicArr = decryptedMnemonic.split(/\s+/);
-        const diffWord = mnemonicArr.filter((item, idx) => item !== userArr[idx]);
-
-        //특수문자 에러
-        if(invalidRegex.test(userInput)){
-            setError("Invalid recovery phrase");
-            return;
-        }
-        //니모닉 불일치 에러
-        else if(decryptedMnemonic === userInput){
-            setError("Already been imported");
-            return;
-        //니모닉 개수 에러
-        }else if(mnemonicArr.length !== userArr.length){
-            setError("Invalid recovery phrase");
-            return;
-        //성공시
-        }else if(diffWord.length === 0){
-            navigate('/login');
+            //니모닉 불일치 에러
+            else if(decryptedMnemonic === userInput){
+                setError("Already been imported");
+                return;
+            //니모닉 개수 에러
+            }else if(mnemonicArr.length !== userArr.length){
+                setError("Invalid recovery phrase");
+                return;
+            //성공시
+            }else if(diffWord.length === 0){
+                navigate('/login');
+            }
+        }catch(error){
+            console.error('지갑 import 중 오류 발생:', error);
+            setError("Failed to import wallet. Please try again");
+            if (error instanceof Error && error.message.includes('JSON')) {
+                localStorage.removeItem('wallet_data');
+            }
         }
     }
   return (
